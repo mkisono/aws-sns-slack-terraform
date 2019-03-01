@@ -249,9 +249,9 @@ def lambda_handler(event, context):
     elif json_msg.get('source') == 'aws.ecs' and \
          json_msg.get('detail-type') == 'ECS Task State Change':
         event_src = 'ecs_task_state_change'
-        detail = json_msg['resources']['detail']
+        message = json_msg.get('detail-type')
+        detail = json_msg['detail']
         attachments = [{
-            "fallback": message,
             "color": "good",
             "fields": [{
                 "title": "desiredStatus",
@@ -261,6 +261,10 @@ def lambda_handler(event, context):
                 "title": "lastStatus",
                 "value": detail['lastStatus'],
                 "short": True
+            }, {
+                "title": "containerInstanceArn",
+                "value": detail['containerInstanceArn'],
+                "short": False
             }]
         }]
     else:
