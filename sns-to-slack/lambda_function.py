@@ -72,7 +72,10 @@ def get_slack_emoji(event_src, topic_name, event_cond='default'):
         'elasticache': {
             'notices': {'default': ':stopwatch:'}},
         'rds': {
-            'notices': {'default': ':registered:'}}}
+            'notices': {'default': ':registered:'}},
+        'ecs_task_state_change': {
+            'notices': {'default': ':scales:'}}
+    }
 
     try:
         return emoji_map[event_src][topic_name][event_cond]
@@ -90,7 +93,9 @@ def get_slack_username(event_src):
         'autoscaling': 'AWS AutoScaling',
         'elasticache': 'AWS ElastiCache',
         'codepipeline': 'AWS CodePipeline',
-        'rds': 'AWS RDS'}
+        'rds': 'AWS RDS',
+        'ecs_task_state_change': 'Amazon ECS'
+    }
 
     try:
         return "{0}{1}".format(USERNAME_PREFIX, username_map[event_src])
@@ -239,6 +244,27 @@ def lambda_handler(event, context):
             }, {
                 "title": "State",
                 "value": json_msg.get('detail').get('state')
+            }]
+        }]
+    elif json_msg.get('source') == 'aws.ecs' and \
+         json_msg.get('detail-type') == 'ECS Task State Change':
+        event_src = 'ecs_task_state_change'
+        message = json_msg.get('detail-type')
+        detail = json_msg['detail']
+        attachments = [{
+            "color": "good",
+            "fields": [{
+                "title": "desiredStatus",
+                "value": detail['desiredStatus'],
+                "short": True
+            }, {
+                "title": "lastStatus",
+                "value": detail['lastStatus'],
+                "short": True
+            }, {
+                "title": "containerInstanceArn",
+                "value": detail['containerInstanceArn'],
+                "short": False
             }]
         }]
     else:
