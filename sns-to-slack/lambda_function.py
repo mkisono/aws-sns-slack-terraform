@@ -240,10 +240,16 @@ def lambda_handler(event, context):
             'color': color_map[event_cond],
             "fields": [{
                 "title": "Pipeline",
-                "value": json_msg.get('detail').get('pipeline')
+                "value": json_msg.get('detail').get('pipeline'),
+                "short": False
+            }, {
+                "title": "Action",
+                "value": json_msg.get('detail').get('action'),
+                "short": True
             }, {
                 "title": "State",
-                "value": json_msg.get('detail').get('state')
+                "value": json_msg.get('detail').get('state'),
+                "short": True
             }]
         }]
     elif json_msg.get('source') == 'aws.ecs' and \
